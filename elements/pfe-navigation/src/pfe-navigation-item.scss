@@ -13,11 +13,7 @@ $pfe-navigation__aside--width--lg: 300px;
 /// DEFAULT navigation-item
 /// ===========================================================================
 :host {
-	// Update the navigation padding in this context
-	--pfe-navigation-item--Padding--vertical:   #{pfe-var(container-spacer)};
-	--pfe-navigation-item--Padding--horizontal: #{pfe-var(container-spacer)};
-
-	--pfe-navigation-item__tray--Width__aside: 	#{$pfe-navigation__aside--width--lg};
+	--pfe-navigation-item__tray--Width__aside: 	#{$pfe-navigation__aside--width--sm};
 	--pfe-navigation-item__tray--BorderTop: 	1px solid gray;
 
 	--pfe-navigation-item--Color: 				#{pfe-local(main)};
@@ -30,7 +26,13 @@ $pfe-navigation__aside--width--lg: 300px;
 	--pfe-navigation-item--aux:         transparent;                     // bg
 	--pfe-navigation-item--aux--hover:  #{pfe-color(surface--darkest)};  // bg hover
 
+	display: flex;
+	height: 100%;
+
 	font-family: #{pfe-var(font-family)};
+	@media (min-width: #{pfe-breakpoint(lg)}){
+		--pfe-navigation-item__tray--Width__aside: 	#{$pfe-navigation__aside--width--lg};
+	}
 	* {
 		box-sizing: border-box;
 	}
@@ -67,8 +69,7 @@ $pfe-navigation__aside--width--lg: 300px;
 
 ::slotted([slot="tray"]) {
 	display: grid;
-	grid-template-areas:
-		"main";
+	grid-template-areas: "main";
 	grid-template-columns: 1fr;
 	grid-gap: #{pfe-var(container-spacer)};
 	width: 100%;
@@ -76,7 +77,7 @@ $pfe-navigation__aside--width--lg: 300px;
 ::slotted([slot="tray"][has-aside]) {
 	grid-template-areas:
 		"main aside";
-	grid-template-columns: 1fr #{pfe-local(Width__aside, tray)};
+		grid-template-columns: 1fr #{pfe-local($cssvar: Width__aside, $fallback: #{$pfe-navigation__aside--width--sm}, $region: tray)};
 }
 ::slotted([slot="tray"][has-footer]) {
 	grid-template-areas:
@@ -92,31 +93,19 @@ $pfe-navigation__aside--width--lg: 300px;
 .pfe-navigation-item {
 	&__trigger {
 		&[pfe-menu="desktop"] {
-			transition: all #{pfe-var(animation-timing)};
-			cursor: 			pointer;
-			text-decoration: 	none;
+			@include pfe-navigation-item(
+				$accent-color: #{pfe-local(BorderTopColor)}
+			);
 
-			border-top:       #{pfe-local(BorderTopColor)} solid 2px;
 			color:            #{pfe-local(Color)}; //text
 			background-color: #{pfe-local(BackgroundColor)};  //bg
-			line-height: 	  #{$pfe-navigation--height};
 
-			flex: 1;
-			display:			flex;
-			flex-flow: 			column nowrap;
-			align-items: 		center;
-			justify-content: 	space-between;
-
-			min-width: 80px;
-			padding: 20px 3px;
-
-			// Fill the navigation container
-			height: 100%;
-			min-height:  #{$pfe-navigation--height};
-
+			&[aria-expanded="true"] {
+				--pfe-navigation-item--Color:			#{pfe-local(main--hover)};
+				--pfe-navigation-item--BackgroundColor: #{pfe-local(aux--hover)};
+				--pfe-navigation-item--BorderTopColor:  #{pfe-color(surface--accent)};
+			}
 			&:hover {
-			  --pfe-navigation-item--Color:			#{pfe-local(main--hover)};
-			  --pfe-navigation-item--BackgroundColor: #{pfe-local(aux--hover)};
 			  --pfe-navigation-item--BorderTopColor:  #{pfe-color(surface--accent)};
 			}
 			&:active {
@@ -144,6 +133,7 @@ $pfe-navigation__aside--width--lg: 300px;
 	}
 
 	&__icon {
+		position: relative;
 		display: flex;
 		width: 	20px;
 
@@ -153,15 +143,8 @@ $pfe-navigation__aside--width--lg: 300px;
 		[pfe-menu="mobile"] & {
 			padding: 0 10px 0 0;
 		}
-
 		[pfe-icon="bento"] & #Icon {
 			-webkit-text-fill-color: 	 #{pfe-local(Color)};
-			fill: 	#{pfe-local(Color)};
-		}
-		[pfe-icon="menu"] & #Icon {
-			-webkit-text-stroke-color: #{pfe-local(Color)};
-			-webkit-text-fill-color: 	 #{pfe-local(Color)};
-			stroke: #{pfe-local(Color)};
 			fill: 	#{pfe-local(Color)};
 		}
 		[pfe-icon="user"] & #Icon,
@@ -174,22 +157,20 @@ $pfe-navigation__aside--width--lg: 300px;
 
 	&__text,
 	&__link {
-		margin: 0;
-		color:  #{pfe-local(Color)};
-		line-height: 1.2;
-		
-		font-size: 0.9em;
-		padding: 0 #{pfe-local(Padding--horizontal)};
+		@include pfe-navigation-text(
+			$color: #{pfe-local(Color)}
+		);
 
 		//shrink the text size of nav items with icons
 		[pfe-icon] & {
-			font-size: 0.8em;
+			font-size: .8em;
 		}
 	}
 	
 	&__tray {
 		display: block;
 		position: absolute;
+		top: 100%;
 		left: 0;
 		margin-top: -2px;
 		width: 100%;
@@ -207,7 +188,7 @@ $pfe-navigation__aside--width--lg: 300px;
 	&__container {
 		display: 	flex;
 		flex-flow:  row wrap;
-		margin:    	#{pfe-var(container-spacer)};
+		margin:    	#{pfe-var(container-spacer)} auto;
 		width: 		var(--pfe-navigation--Width);
 	}
 }

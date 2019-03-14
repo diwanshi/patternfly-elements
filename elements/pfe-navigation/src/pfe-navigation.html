@@ -4,23 +4,34 @@
         <slot name="logo" class="pfe-navigation__logo"></slot>
         <slot name="skip" class="pfe-navigation__skip"></slot>
         <slot name="main" class="pfe-navigation__main"></slot>
-        <div class="pfe-navigation__utility">
-            <pfe-navigation-item pfe-icon="menu">
-                <span slot="trigger">Menu</span>
-                <div slot="tray">
-                    <div class="pfe-navigation__utility--mobile">
-                        <!--slot name="search"></slot-->
-                        <!--slot name="main" class="pfe-navigation__main"></slot-->
-                        <!--slot name="login"></slot-->
-                        <!--slot name="language"></slot-->
-                    </div>
-                </div>
-            </pfe-navigation-item>
-            <slot name="search" class="pfe-navigation__utility-links"></slot>
-            <slot name="login" class="pfe-navigation__utility-links"></slot>
-            <slot name="language" class="pfe-navigation__utility-links"></slot>
-            <slot name="site-switcher" class="pfe-navigation__utility-links"></slot>
+        <slot name="search" class="pfe-navigation__search"></slot>
+        <slot name="login" class="pfe-navigation__login"></slot>
+        <slot name="language" class="pfe-navigation__language"></slot>
+        <div class="pfe-navigation__menu">
+            <span class="pfe-navigation__menu--icon">
+                <?xml version="1.0" encoding="UTF-8"?>
+                <svg width="23px" height="18px" viewBox="0 0 23 18" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                    <g class="animating-icon initial-state" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                        <title>Menu</title>
+                        <g id="Icon">
+                            <rect id="Rectangle" x="0.5" y="14.5" width="22" height="3"></rect>
+                            <rect id="Rectangle" x="0.5" y="7.5" width="22" height="3"></rect>
+                            <rect id="Rectangle" x="0.5" y="0.5" width="22" height="3"></rect>
+                        </g>
+                    </g>
+                
+                    <g class="animating-icon active-state" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" style="display: none;" aria-hidden="true">
+                        <title>Open state</title>
+                        <g id="Icon" transform="translate(2.000000, 1.000000)" stroke="#252525" stroke-width="3">
+                            <path d="M0,15 L15,0" id="Path"></path>
+                            <path d="M15,15 L0,0" id="Path"></path>
+                        </g>
+                    </g>
+                </svg>
+            </span>
+            <span class="pfe-navigation__menu--text">${this.getAttribute("pfe-navigation--menu-text") || "Menu"}</span>
         </div>
+        <slot name="site-switcher" class="pfe-navigation__site-switcher"></slot>
     </div>
 </div>
 <div class="pfe-navigation__overlay" hidden></div>

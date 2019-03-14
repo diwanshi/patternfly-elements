@@ -2,6 +2,8 @@
 
 $LOCAL: navigation;
 
+$pfe-navigation--height: 4em;
+
 /// ===========================================================================
 /// Component Specific SASS Vars
 /// ===========================================================================
@@ -19,7 +21,8 @@ $LOCAL: navigation;
 	--pfe-navigation--Color: #{pfe-color(surface--darkest--text)};
 
 	// Border settings
-	--pfe-navigation--Border:                          #{pfe-var(surface--border-width)} #{pfe-var(surface--border-style)} transparent;
+	--pfe-navigation--Border: #{pfe-var(surface--border-width)} #{pfe-var(surface--border-style)} transparent;
+	--pfe-navigation-item--BorderTopColor: transparent;
 
 	// Band width logic
 	// Initialize at mobile breakpoint
@@ -38,10 +41,15 @@ $LOCAL: navigation;
 	  --pfe-navigation--Padding: calc(#{pfe-local(Padding--vertical)} / 2) #{pfe-local(Padding--horizontal)};
 	}
 
+	// This is used to align the tray for the navigation-items
+	position: relative;
+
 	display: block;
 	background-color: #{pfe-local(BackgroundColor)};
 	color: #{pfe-local(Color)};
 	width: 100%;
+
+	font-family: #{pfe-var(font-family)};
 }
 
 :host([pfe-sticky]) {
@@ -63,16 +71,15 @@ $LOCAL: navigation;
 	@include pfe-sr-only;
 }
 
-::slotted([slot="main"]) {
-	display: contents;
-}
-
 .pfe-navigation {
 	&__logo {
 		grid-area: logo;
 	}
 	&__skip {
 		grid-area: skip;
+	}
+	&__site-switcher {
+		grid-area: site-switcher;
 	}
 	&__wrapper {
 		position: relative;
@@ -87,11 +94,18 @@ $LOCAL: navigation;
 		z-index: 	2;
 
 		display: grid;
-		grid-template-rows: 1fr;
-		grid-gap: 20px;
-		grid-template-areas: "logo utility utility";
+		// grid-gap: 10px;
+		grid-template-areas: "logo menu site-switcher";
+		// grid-template-rows: #{$pfe-navigation--height} repeat(4, 1fr);
+		grid-template-columns: 1fr auto auto;
+		@media (min-width: #{pfe-breakpoint(md)}) {
+			grid-template-areas: "logo menu search language login site-switcher";
+			grid-template-columns: 1fr repeat(5, min-content);
+		}
 		@media (min-width: #{pfe-breakpoint(lg)}) {
-			grid-template-areas: "logo main main main utility";
+			grid-template-areas: "logo main search language login site-switcher";
+			grid-template-columns: min-content 1fr repeat(4, min-content);
+			grid-template-rows: minmax(4em, 1fr);
 		}
 	}
 	&__overlay {
@@ -107,6 +121,56 @@ $LOCAL: navigation;
 			display: none;
 		}
 	}
+	&__menu {
+		grid-area: menu;
+
+		@include pfe-navigation-item(
+			$accent-color: #{var(--pfe-navigation-item--BorderTopColor)}
+		);
+
+		@media (min-width: #{pfe-breakpoint(lg)}) {
+			display: none;
+		}
+		&[aria-expanded="true"] {
+			--pfe-navigation-item--Color:			#{pfe-local(main--hover)};
+			--pfe-navigation-item--BackgroundColor: #{pfe-local(aux--hover)};
+			--pfe-navigation-item--BorderTopColor:  #{pfe-color(surface--accent)};
+		}
+		&:hover {
+		  --pfe-navigation-item--BorderTopColor:  #{pfe-color(surface--accent)};
+		}
+		&:active {
+			--pfe-navigation-item--Color:			#{pfe-local(main--hover)};
+			--pfe-navigation-item--BackgroundColor: #{pfe-local(aux--hover)};
+			--pfe-navigation-item--BorderTopColor:  #{pfe-color(surface--accent)};
+		}
+		&:focus {
+			--pfe-navigation-item--Color: 			#{pfe-local(main--hover)};
+			--pfe-navigation-item--BackgroundColor: #{pfe-local(aux--hover)};
+			--pfe-navigation-item--BorderTopColor:  #{pfe-color(surface--accent)};
+			&:not(:focus-visible) {
+				outline: none; // removes outline for mouse users, preserves it for keyboard users
+			}
+		}
+		&--icon {
+			position: relative;
+			display: flex;
+			width: 	20px;
+			padding: 0 0 10px 0;
+			#Icon {
+				-webkit-text-stroke-color: #{pfe-local(Color)};
+				-webkit-text-fill-color: 	 #{pfe-local(Color)};
+				stroke: #{pfe-local(Color)};
+				fill: 	#{pfe-local(Color)};
+			}
+		}
+		&--text {
+			@include pfe-navigation-text(
+				$font-size: .8em,
+				$color: var(--pfe-navigation-item--Color)
+			);
+		}
+	}
 	&__main {
 		grid-area: main;
 		display: none;
@@ -115,6 +179,27 @@ $LOCAL: navigation;
 			flex-flow: row nowrap;
 			align-items: stretch;
 			justify-content: flex-start;
+		}
+	}
+	&__search {
+		grid-area: search;
+		display: none;
+		@media (min-width: #{pfe-breakpoint(sm)}) {
+			display: block;
+		}
+	}
+	&__login {
+		grid-area: login;
+		display: none;
+		@media (min-width: #{pfe-breakpoint(sm)}) {
+			display: block;
+		}
+	}
+	&__language {
+		grid-area: language;
+		display: none;
+		@media (min-width: #{pfe-breakpoint(sm)}) {
+			display: block;
 		}
 	}
 	&__utility {

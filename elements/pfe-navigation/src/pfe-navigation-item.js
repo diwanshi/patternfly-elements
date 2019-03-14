@@ -29,10 +29,14 @@ class PfeNavigationItem extends PFElement {
   }
 
   set expanded(val) {
+
+    console.log("here?");
+    console.log(this);
     val = Boolean(val);
 
     if (val) {
       this.classList.add("expanded");
+      this._transitionIcon(this.icon); 
 
       if (this.trigger.shadow) {
         this.trigger.shadow.setAttribute("aria-expanded", true);
@@ -68,10 +72,8 @@ class PfeNavigationItem extends PFElement {
     return {
       bento: `<?xml version="1.0" encoding="UTF-8"?>
       <svg width="19px" height="19px" viewBox="0 0 19 19" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-          <!-- Generator: Sketch 53.2 (72643) - https://sketchapp.com -->
-          <title>Icon</title>
-          <desc>Created with Sketch.</desc>
-          <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+          <g class="animating-icon initial-state" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+              <title>Bento box</title>
               <g id="Icon">
                   <rect id="Rectangle" x="14" y="14" width="5" height="5"></rect>
                   <rect id="Rectangle" x="7" y="14" width="5" height="5"></rect>
@@ -82,6 +84,14 @@ class PfeNavigationItem extends PFElement {
                   <rect id="Rectangle" x="14" y="0" width="5" height="5"></rect>
                   <rect id="Rectangle" x="7" y="0" width="5" height="5"></rect>
                   <rect id="Rectangle" x="0" y="0" width="5" height="5"></rect>
+              </g>
+          </g>
+      
+          <g class="animating-icon active-state" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" style="display: none;" aria-hidden="true">
+              <title>Open state</title>
+              <g id="Icon" transform="translate(2.000000, 1.000000)" stroke="#252525" stroke-width="3">
+                  <path d="M0,15 L15,0" id="Path"></path>
+                  <path d="M15,15 L0,0" id="Path"></path>
               </g>
           </g>
       </svg>`,
@@ -183,20 +193,27 @@ class PfeNavigationItem extends PFElement {
     super.connectedCallback();
 
     if(this.trigger.light) {
+      // Get the inner text of the trigger element and assign it to an attribute
+      this.setAttribute("aria-label", this.trigger.light.map(el => el.innerText).join(" | "));
+
       // If the role attribute has not been provided, attach it to the trigger
-      if (!this.trigger.shadow.hasAttribute("role")) {
+      if (this.trigger.shadow && !this.trigger.shadow.hasAttribute("role")) {
         this.trigger.shadow.setAttribute("role", "button");
+      }
+      if(this.trigger.shadow) {
         if(this.hasAttribute("pfe-menu")) {
           this.trigger.shadow.setAttribute("pfe-menu", this.getAttribute("pfe-menu"));
         } else {
           this.trigger.shadow.setAttribute("pfe-menu", "desktop");
         }
-      }
 
-      // Attach an on click listener
-      this.trigger.shadow.addEventListener("click", this._clickHandler);
-      // Attach an on keydown listener
-      this.trigger.shadow.addEventListener("keydown", this._keydownHandler);
+        this.icon = this.trigger.shadow.querySelector("svg");
+
+        // Attach an on click listener
+        this.trigger.shadow.addEventListener("click", this._clickHandler);
+        // Attach an on keydown listener
+        this.trigger.shadow.addEventListener("keydown", this._keydownHandler);
+      }
 
       // Remove the hidden attribute from the light DOM element
       if(this.tray.light) {
@@ -213,13 +230,11 @@ class PfeNavigationItem extends PFElement {
             if (trayRegions[i].hasAttribute("tray-region")) {
               // Apply the grid area property to each region
               trayRegions[i].style.gridArea = trayRegions[i].getAttribute("tray-region");
-              if(this.tray.shadow) {
-                this.tray.shadow.setAttribute(`has-${trayRegions[i].getAttribute("tray-region")}`, true);
-              }
+              trayItem.setAttribute(`has-${trayRegions[i].getAttribute("tray-region")}`, true);
               // Add additional border and padding properties to the footer
               if(trayRegions[i].getAttribute("tray-region") === "footer") {
                 trayRegions[i].style.borderTop = "var(--pfe-navigation-item__tray--BorderTop)";
-                trayRegions[i].style.paddingTop = "var(--pfe-navigation-item--Padding--vertical)";
+                trayRegions[i].style.paddingTop = "1em";
               }
             }
           }
@@ -290,6 +305,32 @@ class PfeNavigationItem extends PFElement {
         return;
     }
   }
+
+  _transitionIcon( element ) {
+    const states = [...element.querySelectorAll('.animating-icon')];
+    const time = {
+      start: null,
+      total: 200
+    };
+    let status = {
+      interacted : false,
+      animating : false
+    };
+
+    // Initialize it
+    element.addEventListener('click', () => {
+      if(status.animating) return;
+      status.animating = true;
+      window.requestAnimationFrame(this._triggerAnimation.bind(element));
+    });
+  }
+
+  _triggerAnimation( timestamp ) {
+    //.. this is where the animation takes place
+    console.log("animate?");
+    console.log(this);
+  };
+
 }
 
 PFElement.create(PfeNavigationItem);
